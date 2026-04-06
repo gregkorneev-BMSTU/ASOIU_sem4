@@ -1,23 +1,49 @@
-namespace Sem4;
+namespace seminar_4;
 
+/// <summary>
+/// Список
+/// </summary>
 public class SimpleList<T> : IEnumerable<T>
     where T : IComparable
 {
+    /// <summary>
+    /// Первый элемент списка
+    /// </summary>
     protected SimpleListItem<T>? first;
+    //В C# поля ссылочных типов всегда
+    //инициализируются значением null по умолчанию
+    //Следующее объявление корректно но избыточно:
+    //protected SimpleListItem<T>? first = null;
+
+    /// <summary>
+    /// Последний элемент списка
+    /// </summary>
     protected SimpleListItem<T>? last;
 
+    /// <summary>
+    /// Количество элементов
+    /// </summary>
     public int Count { get; protected set; }
 
+    /// <summary>
+    /// Добавление элемента
+    /// </summary>
     public void Add(T element)
     {
         var newItem = new SimpleListItem<T>(element);
         Count++;
 
+        // Добавление первого элемента
         if (last is null)
+        //if (first is null) - также корректно
+        //но тогда для last.Next = newItem;
+        //будет выдаваться предупреждение:
+        //"Разыменование вероятной пустой ссылки."
         {
             first = newItem;
             last = newItem;
         }
+        // Добавление следующих элементов
         else
         {
             last.Next = newItem;
@@ -25,29 +51,31 @@ public class SimpleList<T> : IEnumerable<T>
         }
     }
 
+    /// <summary>
+    /// Чтение контейнера с заданным номером
+    /// </summary>
     public SimpleListItem<T> GetItem(int number)
     {
         if (number < 0 || number >= Count)
-        {
-            throw new IndexOutOfRangeException($"Индекс {number} выходит за границы списка.");
-        }
-
+            throw new IndexOutOfRangeException(
+                $"Индекс {number} выходит за границы списка");
         var current = first;
-
-        for (var i = 0; i < number; i++)
-        {
+        for (int i = 0; i < number; i++)
             current = current!.Next;
-        }
-
         return current!;
     }
 
+    /// <summary>
+    /// Чтение элемента с заданным номером
+    /// </summary>
     public T Get(int number) => GetItem(number).Data;
 
+    /// <summary>
+    /// Для перебора коллекции
+    /// </summary>
     public IEnumerator<T> GetEnumerator()
     {
         var current = first;
-
         while (current is not null)
         {
             yield return current.Data;
@@ -55,34 +83,29 @@ public class SimpleList<T> : IEnumerable<T>
         }
     }
 
-    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+    // Реализация обобщённого IEnumerator<T> требует реализации
+    // необобщённого интерфейса IEnumerable
+    System.Collections.IEnumerator
+        System.Collections.IEnumerable.GetEnumerator()
+        => GetEnumerator();
 
-    public void Sort()
-    {
-        if (Count > 1)
-        {
-            Sort(0, Count - 1);
-        }
-    }
+    /// <summary>
+    /// Сортировка
+    /// </summary>
+    public void Sort() => Sort(0, Count - 1);
 
+    /// <summary>
+    /// Алгоритм быстрой сортировки
+    /// </summary>
     private void Sort(int low, int high)
     {
-        var i = low;
-        var j = high;
-        var pivot = Get((low + high) / 2);
-
+        int i = low;
+        int j = high;
+        T x = Get((low + high) / 2);
         do
         {
-            while (Get(i).CompareTo(pivot) < 0)
-            {
-                i++;
-            }
-
-            while (Get(j).CompareTo(pivot) > 0)
-            {
-                j--;
-            }
-
+            while (Get(i).CompareTo(x) < 0) ++i;
+            while (Get(j).CompareTo(x) > 0) --j;
             if (i <= j)
             {
                 Swap(i, j);
@@ -90,23 +113,17 @@ public class SimpleList<T> : IEnumerable<T>
                 j--;
             }
         } while (i <= j);
-
-        if (low < j)
-        {
-            Sort(low, j);
-        }
-
-        if (i < high)
-        {
-            Sort(i, high);
-        }
+        if (low < j) Sort(low, j);
+        if (i < high) Sort(i, high);
     }
 
+    /// <summary>
+    /// Вспомогательный метод для обмена элементов при сортировке
+    /// </summary>
     private void Swap(int i, int j)
     {
-        var left = GetItem(i);
-        var right = GetItem(j);
-
-        (left.Data, right.Data) = (right.Data, left.Data);
+        var ci = GetItem(i);
+        var cj = GetItem(j);
+        (ci.Data, cj.Data) = (cj.Data, ci.Data);
     }
 }

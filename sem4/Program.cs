@@ -1,60 +1,67 @@
-using Sem4;
+namespace seminar_4;
 
-var rect = new Rectangle(5, 4);
-var square = new Square(5);
-var circle = new Circle(5);
-
-Console.WriteLine("Геометрические фигуры:");
-Console.WriteLine(rect);
-Console.WriteLine(square);
-Console.WriteLine(circle);
-
-Console.WriteLine();
-Console.WriteLine("Разреженная матрица:");
-
-var matrix = new Matrix<Figure>(3, 3, new FigureMatrixCheckEmpty())
+internal class Program
 {
-    ColumnWidth = 30
-};
+    private static void Main(string[] args)
+    {
+        ///////////////////////////////
+        #region Геометрические фигуры
 
-matrix[0, 0] = rect;
-matrix[1, 1] = square;
-matrix[2, 2] = circle;
-matrix[2, 0] = new Rectangle(2, 8);
+        Rectangle rect = new(5, 4);
+        Square square = new(5);
+        Circle circle = new(5);
 
-Console.WriteLine(matrix);
+        Console.WriteLine(rect);
+        Console.WriteLine(square);
+        Console.WriteLine(circle);
 
-Console.WriteLine("Список фигур:");
+        #endregion
 
-var list = new SimpleList<Figure>();
-list.Add(circle);
-list.Add(rect);
-list.Add(square);
+        //********************************************************
+        // Матрица
+        //********************************************************
+        Console.WriteLine("\nМатрица");
+        Matrix<Figure> matrix = new(3, 3, new FigureMatrixCheckEmpty());
+        matrix[0, 0] = rect;
+        matrix[1, 1] = square;
+        matrix[2, 2] = circle;
+        Console.WriteLine(matrix);
 
-Console.WriteLine("До сортировки:");
-foreach (var figure in list)
-{
-    Console.WriteLine(figure);
-}
+        //********************************************************
+        // Список
+        //********************************************************
+        SimpleList<Figure> list = new();
+        list.Add(circle);
+        list.Add(rect);
+        list.Add(square);
 
-list.Sort();
+        Console.WriteLine("\nПеред сортировкой списка:");
+        foreach (var x in list)
+        {
+            Console.WriteLine(x);
+        }
 
-Console.WriteLine();
-Console.WriteLine("После сортировки:");
-foreach (var figure in list)
-{
-    Console.WriteLine(figure);
-}
+        list.Sort();
 
-Console.WriteLine();
-Console.WriteLine("Стек фигур:");
+        Console.WriteLine("\nПосле сортировки списка:");
+        foreach (var x in list)
+        {
+            Console.WriteLine(x);
+        }
 
-var stack = new SimpleStack<Figure>();
-stack.Push(rect);
-stack.Push(square);
-stack.Push(circle);
+        //********************************************************
+        // Стек
+        //********************************************************
+        SimpleStack<Figure> stack = new();
+        stack.Push(rect);
+        stack.Push(square);
+        stack.Push(circle);
 
-while (stack.Count > 0)
-{
-    Console.WriteLine(stack.Pop());
+        Console.WriteLine("\nВывод данных стека:");
+        while (stack.Count > 0)
+        {
+            Figure f = stack.Pop();
+            Console.WriteLine(f);
+        }
+    }
 }

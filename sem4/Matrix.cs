@@ -1,70 +1,76 @@
 using System.Text;
 
-namespace Sem4;
+namespace seminar_4;
 
+/// <summary>
+/// Класс разреженной матрицы
+/// с первичным конструктором
+/// </summary>
+/// <typeparam name="T">Класс, объекты которого предполагается помещать в ячейку матрицы</typeparam>
+/// <param name="maxX">Максимальное количество колонок матрицы</param>
+/// <param name="maxY">Максимальное количество строк матрицы</param>
+/// <param name="checkEmpty">Объект класса реализующего проверку на пустоту</param>
 public class Matrix<T>(int maxX, int maxY, IMatrixCheckEmpty<T> checkEmpty)
 {
-    private readonly Dictionary<(int x, int y), T> _matrix = [];
+    /// <summary>
+    /// Словарь для хранения значений
+    /// </summary>
+    readonly Dictionary<(int x, int y), T> _matrix = [];
 
-    public int ColumnWidth { get; set; } = 32;
-
+    /// <summary>
+    /// Индексатор для доступа к данным
+    /// </summary>
     public T this[int x, int y]
     {
+        set
+        {
+            CheckBounds(x, y);
+            _matrix[(x, y)] = value;
+        }
         get
         {
             CheckBounds(x, y);
-
             return _matrix.TryGetValue((x, y), out var element)
                 ? element
                 : checkEmpty.GetEmptyElement();
         }
-        set
-        {
-            CheckBounds(x, y);
-
-            if (checkEmpty.CheckEmptyElement(value))
-            {
-                _matrix.Remove((x, y));
-                return;
-            }
-
-            _matrix[(x, y)] = value;
-        }
     }
 
-    private void CheckBounds(int x, int y)
+    /// <summary>
+    /// Проверка границ
+    /// </summary>
+    void CheckBounds(int x, int y)
     {
         if (x < 0 || x >= maxX)
-        {
-            throw new ArgumentOutOfRangeException(nameof(x), $"x={x} выходит за границы матрицы.");
-        }
-
+            throw new ArgumentOutOfRangeException(nameof(x), $"x={x} выходит за границы");
         if (y < 0 || y >= maxY)
-        {
-            throw new ArgumentOutOfRangeException(nameof(y), $"y={y} выходит за границы матрицы.");
-        }
+            throw new ArgumentOutOfRangeException(nameof(y), $"y={y} выходит за границы");
     }
 
+    /// <summary>
+    /// Ширина столбца при выводе матрицы (символов)
+    /// </summary>
+    public int ColumnWidth { get; set; } = 32;
+
+    /// <summary>
+    /// Приведение к строке в табличном виде
+    /// </summary>
     public override string ToString()
     {
-        var builder = new StringBuilder();
-
-        for (var y = 0; y < maxY; y++)
+        var b = new StringBuilder();
+        for (int j = 0; j < maxY; j++)
         {
-            builder.Append('|');
-
-            for (var x = 0; x < maxX; x++)
+            b.Append('|');
+            for (int i = 0; i < maxX; i++)
             {
-                var element = this[x, y];
-                var cell = checkEmpty.CheckEmptyElement(element) ? "-" : element?.ToString() ?? "-";
-
-                builder.Append(cell.PadRight(ColumnWidth));
-                builder.Append('|');
+                string cell = !checkEmpty.CheckEmptyElement(this[i, j])
+                    ? $"{this[i, j]}"
+                    : "-";
+                b.Append(cell.PadRight(ColumnWidth));
+                b.Append('|');
             }
-
-            builder.AppendLine();
+            b.AppendLine();
         }
-
-        return builder.ToString();
+        return b.ToString();
     }
 }
