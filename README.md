@@ -1,4 +1,4 @@
-# ASOIU_sem4
+# [ASOIU_sem4](https://github.com/ugapanyuk/course-architecture/blob/main/seminars/seminar4.pdf)
 
 ## Что делает проект
 
